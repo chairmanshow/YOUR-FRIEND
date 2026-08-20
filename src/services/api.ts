@@ -4,11 +4,20 @@ export async function sendChatMessage(messages: Message[]): Promise<string> {
   try {
     const response = await fetch('/api/chat', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ messages }),
     });
+
+    if (!response.ok) {
+      return `HTTP Error: Status ${response.status} aaya backend se.`;
+    }
+
+    const data = await response.json();
+    return data.reply || 'API se koi text wapas nahi aaya.';
+  } catch (error: any) {
+    return `Network Error: Frontend Vercel backend (/api/chat) se connect nahi ho paya.`;
+  }
+}
 
     const data = await response.json();
 
