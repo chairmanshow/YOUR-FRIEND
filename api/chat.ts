@@ -1,3 +1,4 @@
+
 export const config = { runtime: 'edge' };
 
 export default async function handler(req: Request) {
@@ -7,7 +8,7 @@ export default async function handler(req: Request) {
 
   try {
     const { messages, systemPrompt } = await req.json();
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = (process as any).env.GEMINI_API_KEY;
 
     if (!apiKey) {
       return new Response(
