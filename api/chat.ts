@@ -11,7 +11,7 @@ export default async function handler(req: Request) {
 
     if (!apiKey) {
       return new Response(
-        JSON.stringify({ reply: "Arey sorry, network thoda down hai 🥺 baad me baat karein?" }),
+        JSON.stringify({ reply: "Arey sorry, network down hai 🥺 baad me baat karein?" }),
         { status: 200 }
       );
     }
