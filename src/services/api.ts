@@ -12,7 +12,7 @@ export async function sendChatMessage(messages: Message[]): Promise<string> {
     .map((m) => `${m.sender === 'user' ? 'User' : 'Sapna'}: ${m.text}`)
     .join('\n');
 
-  const promptText = `You are Sapna, a cute, sweet, caring Indian college friend. Reply naturally in short casual Hindi/Hinglish (1-2 lines). Do not repeat same line.
+  const promptText = `You are Sapna, a cute, sweet, caring Indian college friend. Reply naturally in short casual Hindi/Hinglish (1-2 lines). Keep it warm and realistic like WhatsApp chatting.
 
 Conversation:
 ${context}
@@ -21,7 +21,7 @@ Sapna:`;
 
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -41,6 +41,6 @@ Sapna:`;
     return json.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "Main sun rahi hoon! 😊";
   } catch (err: any) {
     console.error("Fetch Exception:", err);
-    return "Connection error, console check karo!";
+    return "Connection error, please try again!";
   }
 }
