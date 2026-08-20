@@ -13,8 +13,8 @@ export const Chat: React.FC = () => {
       id: '1',
       sender: 'sapna',
       text: 'Hii 😄 kya kar rahe ho?',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    }
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    },
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -30,14 +30,15 @@ export const Chat: React.FC = () => {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  const handleSend = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!input.trim() || isTyping) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
       sender: 'user',
       text: input.trim(),
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
     const updated = [...messages, userMessage];
@@ -46,18 +47,20 @@ export const Chat: React.FC = () => {
     setShowEmojiPicker(false);
     setIsTyping(true);
 
-    // Natural typing delay simulation (600ms - 1200ms)
-    setTimeout(async () => {
+    try {
       const replyText = await sendChatMessage(updated);
       const sapnaMessage: Message = {
         id: (Date.now() + 1).toString(),
         sender: 'sapna',
         text: replyText,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
-      setMessages(prev => [...prev, sapnaMessage]);
+      setMessages((prev) => [...prev, sapnaMessage]);
+    } catch (err) {
+      console.error('Chat error:', err);
+    } finally {
       setIsTyping(false);
-    }, 900);
+    }
   };
 
   return (
@@ -131,11 +134,15 @@ export const Chat: React.FC = () => {
       </div>
 
       {/* Bottom Input Area */}
-      <div className="p-3 bg-slate-900/90 backdrop-blur-md border-t border-slate-800 relative">
+      <form
+        onSubmit={handleSend}
+        className="p-3 bg-slate-900/90 backdrop-blur-md border-t border-slate-800 relative"
+      >
         {showEmojiPicker && (
-          <div className="absolute bottom-16 left-4 bg-slate-800/95 border border-slate-700 p-2 rounded-2xl flex gap-2 shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95">
+          <div className="absolute bottom-16 left-4 bg-slate-800/95 border border-slate-700 p-2 rounded-2xl flex gap-2 shadow-2xl backdrop-blur-md">
             {QUICK_EMOJIS.map((emoji) => (
               <button
+                type="button"
                 key={emoji}
                 onClick={() => {
                   setInput((prev) => prev + emoji);
@@ -151,6 +158,7 @@ export const Chat: React.FC = () => {
 
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={() => setShowEmojiPicker(!showEmojiPicker)}
             className="p-2 text-slate-400 hover:text-slate-200 transition"
           >
@@ -161,12 +169,12 @@ export const Chat: React.FC = () => {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             placeholder="Type a message..."
             className="flex-1 bg-slate-800/80 border border-slate-700/60 rounded-full px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition placeholder-slate-500"
           />
 
           <button
+            type="button"
             onClick={() => setIsCallOpen(true)}
             className="p-2 text-slate-400 hover:text-indigo-400 transition"
             title="Send Voice Message"
@@ -175,14 +183,14 @@ export const Chat: React.FC = () => {
           </button>
 
           <button
-            onClick={handleSend}
-            disabled={!input.trim()}
+            type="submit"
+            disabled={!input.trim() || isTyping}
             className="p-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 disabled:opacity-40 rounded-full text-white shadow-md transition active:scale-95"
           >
             <Send size={18} />
           </button>
         </div>
-      </div>
+      </form>
 
       <CallModal isOpen={isCallOpen} onClose={() => setIsCallOpen(false)} />
     </div>
